@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="tk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Suw Tracker</title>
+  <style>
+    :root {
+      --bg: #0b0e14;
+      --card-bg: rgba(22, 27, 34, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-blue: #00b0ff;
+      --accent-green: #00e676;
+      --text-main: #f0f6fc;
+      --text-sub: #8b949e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      padding: 16px;
+      padding-bottom: 80px;
+      min-height: 100vh;
+    }
+
+    /* Navigasiýa */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-top: 4px;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .page-title { font-size: 18px; font-weight: 800; color: #fff; }
+
+    /* Esasy Suw Paneli */
+    .water-main-card {
+      background: linear-gradient(180deg, #101c2a, #0b1420);
+      border: 1px solid rgba(0, 176, 255, 0.25);
+      border-radius: 20px;
+      padding: 24px 16px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .water-count {
+      font-size: 44px;
+      font-weight: 900;
+      color: var(--accent-blue);
+      margin: 4px 0;
+      text-shadow: 0 0 25px rgba(0, 176, 255, 0.3);
+    }
+    .water-target-lbl { font-size: 13px; color: var(--text-sub); }
+
+    .progress-bar-bg {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 16px auto;
+      max-width: 280px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00b0ff, #00e676);
+      border-radius: 20px;
+      transition: width 0.3s ease;
+    }
+
+    /* Stakanlar Topy */
+    .glasses-title {
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: var(--text-main);
+      display: flex;
+      justify-content: space-between;
+    }
+    .glasses-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .glass-item {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .glass-item:active { transform: scale(0.9); }
+    .glass-item.full {
+      background: rgba(0, 176, 255, 0.2);
+      border-color: var(--accent-blue);
+    }
+    .glass-icon { font-size: 26px; filter: grayscale(100%) opacity(0.35); transition: all 0.2s; }
+    .glass-item.full .glass-icon { filter: none; opacity: 1; transform: scale(1.1); }
+    .glass-ml { font-size: 10px; color: var(--text-sub); margin-top: 4px; font-weight: 700; }
+    .glass-item.full .glass-ml { color: var(--accent-blue); }
+
+    /* Maslahat */
+    .water-tip {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 12px;
+      color: #c9d1d9;
+      line-height: 1.5;
+    }
+
+    .btn-reset {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 82, 82, 0.06);
+      color: #ff5252;
+      border: 1px dashed rgba(255, 82, 82, 0.3);
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      margin-top: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigasiýa -->
+  <div class="nav-bar">
+    <a href="index.html" class="back-btn">⬅ Baş Sahypa</a>
+    <div class="page-title">Gündelik Suw</div>
+  </div>
+
+  <!-- Esasy Görkeziji -->
+  <div class="water-main-card">
+    <div class="water-target-lbl">Şu gün içilen suw:</div>
+    <div class="water-count" id="total-ml">0 ml</div>
+    <div class="water-target-lbl">Gündelik maksat: <b>2500 ml (2.5L)</b></div>
+
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="water-bar"></div>
+    </div>
+    <div id="status-text" style="font-size: 12px; color: var(--accent-blue); font-weight: bold;">0% tamamlandy</div>
+  </div>
+
+  <!-- 10 Sany Stakan -->
+  <div class="glasses-title">
+    <span>Stakanlar (her biri 250 ml):</span>
+    <span style="font-size:12px; color:var(--text-sub);" id="cups-count">0 / 10</span>
+  </div>
+
+  <div class="glasses-grid">
+    <div class="glass-item" onclick="toggleGlass(0)"><div class="glass-icon">🥛</div><div class="glass-ml">250ml</div></div>
+    <div class="glass-item" onclick="toggleGlass(1)"><div class="glass-icon">🥛</div><div class="glass-ml">250ml</div></div>
+    <div class="glass-item" onclick="toggleGlass(2)"><div class="glass-icon">🥛</div><div class="glass-ml">250ml</div></div>
+    <div class="glass-item" onclick="toggleGlass(3)"><div class="glass-icon">🥛</div><div class="glass-ml">250ml</div></div>
+    <div class="glass-item" onclick="toggleGlass(4)"><div class="glass-icon">🥛</div><div class="glass-ml">250ml</div></div>
+    <div class="glass-item" onclick="toggleGlass(5)"><div class="glass-icon">🥛</div><div class="glass-ml">250ml</div></div>
+    <div class="glass-item" onclick="toggleGlass(6)"><div class="glass-icon">🥛</div><div class="glass-ml">250ml</div></div>
+    <div class="glass-item" onclick="toggleGlass(7)"><div class="glass-icon">🥛</div><div class="glass-ml">250ml</div></div>
+    <div class="glass-item" onclick="toggleGlass(8)"><div class="glass-icon">🥛</div><div class="glass-ml">250ml</div></div>
+    <div class="glass-item" onclick="toggleGlass(9)"><div class="glass-icon">🥛</div><div class="glass-ml">250ml</div></div>
+  </div>
+
+  <!-- Maslahat -->
+  <div class="water-tip">
+    💡 <b>Agram toplaýanlar üçin bellik:</b> Türgenleşik wagtynda her 15 minutdan 2–3 ýuwdum suw içiň. Suwsuzlanan myşsa myşsa massasyny ýygnap bilmeýär we çalt ýadaýar.
+  </div>
+
+  <button class="btn-reset" onclick="resetWater()">↺ Şu Günüň Suwuny Täzele</button>
+
+  <script>
+    const GLASS_ML = 250;
+    const TARGET_ML = 2500;
+    let glassesState = JSON.parse(localStorage.getItem('glasses_state') || '[false,false,false,false,false,false,false,false,false,false]');
+
+    function renderWater() {
+      const items = document.querySelectorAll('.glass-item');
+      let filledCount = 0;
+
+      glassesState.forEach((state, i) => {
+        if (state) {
+          items[i].classList.add('full');
+          filledCount++;
+        } else {
+          items[i].classList.remove('full');
+        }
+      });
+
+      const currentMl = filledCount * GLASS_ML;
+      const percent = Math.min(Math.round((currentMl / TARGET_ML) * 100), 100);
+
+      document.getElementById('total-ml').innerText = currentMl + ' ml';
+      document.getElementById('water-bar').style.width = percent + '%';
+      document.getElementById('cups-count').innerText = `${filledCount} / 10`;
+
+      if (percent >= 100) {
+        document.getElementById('status-text').innerText = "🎉 Gutlaýarys! Günüň normasy ýerine ýetirildi!";
+        document.getElementById('status-text').style.color = "var(--accent-green)";
+      } else {
+        document.getElementById('status-text').innerText = percent + "% tamamlandy";
+        document.getElementById('status-text').style.color = "var(--accent-blue)";
+      }
+
+      localStorage.setItem('glasses_state', JSON.stringify(glassesState));
+    }
+
+    function toggleGlass(index) {
+      glassesState[index] = !glassesState[index];
+      renderWater();
+    }
+
+    function resetWater() {
+      if (confirm("Şu günki suw sanawyny arassalamalymy?")) {
+        glassesState = [false,false,false,false,false,false,false,false,false,false];
+        renderWater();
+      }
+    }
+
+    window.onload = renderWater;
+  </script>
+</body>
+</html>

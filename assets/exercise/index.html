@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="tk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>FitTrack Pro - Split</title>
+  <style>
+    :root {
+      --bg: #0b0e14;
+      --card-bg: rgba(22, 27, 34, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary: #ff5722;
+      --primary-gradient: linear-gradient(135deg, #ff6b3d, #ff3d00);
+      --accent-green: #00e676;
+      --accent-blue: #00b0ff;
+      --accent-yellow: #ffd600;
+      --text-main: #f0f6fc;
+      --text-sub: #8b949e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      padding: 16px;
+      padding-bottom: 90px;
+      min-height: 100vh;
+    }
+
+    /* Başlyk */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-top: 4px;
+    }
+    .header-titles h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #fff, #bbb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .user-pill {
+      background: rgba(255, 87, 34, 0.12);
+      border: 1px solid rgba(255, 87, 34, 0.3);
+      color: var(--primary);
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* Sahypalar Menýusy */
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .nav-link {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 8px 2px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 11px;
+      transition: all 0.2s;
+    }
+    .nav-link:active { transform: scale(0.95); background: rgba(255, 87, 34, 0.15); }
+
+    /* Ösüş Barçasy */
+    .progress-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-sub);
+      margin-bottom: 8px;
+    }
+    .progress-bar-bg {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff5722, #00e676);
+      border-radius: 20px;
+      transition: width 0.35s ease;
+    }
+
+    /* Taýmer */
+    .timer-card {
+      background: linear-gradient(180deg, rgba(28, 33, 40, 0.9), rgba(18, 22, 28, 0.95));
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .timer-title { font-size: 11px; text-transform: uppercase; color: var(--text-sub); font-weight: 700; }
+    .timer-display { font-size: 38px; font-weight: 900; color: var(--accent-green); margin: 2px 0 8px 0; font-variant-numeric: tabular-nums; }
+    .timer-actions { display: flex; gap: 6px; justify-content: center; }
+    .timer-btn {
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      border: 1px solid var(--card-border);
+      padding: 7px 13px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .timer-btn:active { transform: scale(0.95); background: var(--primary); }
+    .timer-btn.stop { color: #ff5252; border-color: rgba(255, 82, 82, 0.25); }
+
+    /* Tablar (Split) */
+    .tabs-wrapper {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      margin-bottom: 16px;
+      scrollbar-width: none;
+    }
+    .tabs-wrapper::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      padding: 9px 12px;
+      background: rgba(22, 27, 34, 0.9);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: var(--text-sub);
+      font-weight: 700;
+      font-size: 12px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      background: var(--primary-gradient);
+      color: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(255, 87, 34, 0.35);
+    }
+
+    /* Maşk Kartlary */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.25s ease; }
+
+    .exercise-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      transition: all 0.2s;
+    }
+    .exercise-card.completed {
+      border-color: rgba(0, 230, 118, 0.4);
+      background: rgba(16, 28, 22, 0.5);
+    }
+    .exercise-card.completed .ex-name {
+      text-decoration: line-through;
+      color: var(--text-sub);
+    }
+
+    .card-top { display: flex; align-items: center; justify-content: space-between; }
+    .left-section { display: flex; align-items: center; gap: 12px; flex: 1; }
+
+    /* Custom Checkbox */
+    .custom-check {
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      border: 2px solid #3d444d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .custom-check.checked { background: var(--accent-green); border-color: var(--accent-green); }
+    .custom-check svg { width: 14px; height: 14px; stroke: #000; stroke-width: 3; fill: none; display: none; }
+    .custom-check.checked svg { display: block; }
+
+    .ex-details { display: flex; flex-direction: column; gap: 2px; }
+    .badge {
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 6px;
+      display: inline-block;
+      width: fit-content;
+      margin-bottom: 2px;
+    }
+    .badge-blue { background: rgba(0, 176, 255, 0.15); color: #40c4ff; }
+    .badge-green { background: rgba(0, 230, 118, 0.15); color: #69f0ae; }
+    .badge-orange { background: rgba(255, 87, 34, 0.15); color: #ff7043; }
+    .badge-purple { background: rgba(179, 136, 255, 0.15); color: #b388ff; }
+
+    .ex-name { font-size: 14px; font-weight: 700; color: var(--text-main); }
+    .ex-meta { font-size: 11px; color: var(--text-sub); }
+
+    .btn-gif {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--accent-blue);
+      padding: 7px 11px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-gif:active { transform: scale(0.92); }
+
+    .gif-collapse {
+      display: none;
+      margin-top: 10px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #000;
+      text-align: center;
+    }
+    .gif-collapse.open { display: block; }
+    .gif-collapse img { max-width: 100%; height: auto; max-height: 200px; display: block; margin: 0 auto; }
+
+    .btn-reset {
+      width: 100%;
+      padding: 13px;
+      background: rgba(255, 82, 82, 0.06);
+      color: #ff5252;
+      border: 1px dashed rgba(255, 82, 82, 0.3);
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      margin-top: 16px;
+      cursor: pointer;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  </style>
+</head>
+<body>
+
+  <!-- Profil Başlygy -->
+  <div class="header">
+    <div class="header-titles">
+      <h1>TÜRGENLEŞIK</h1>
+    </div>
+    <div class="user-pill">Günlik Meýilnama</div>
+  </div>
+
+  <!-- Sahypalara Geçiş Menýusy -->
+  <div class="nav-grid">
+    <a href="mashklar.html" class="nav-link">📚 Maşklar</a>
+    <a href="osush.html" class="nav-link">📈 Ösüşim</a>
+    <a href="razminka.html" class="nav-link">🔥 Gyzyşmak</a>
+    <a href="suw.html" class="nav-link" style="grid-column: span 2;">💧 Suw Tracker</a>
+  </div>
+
+  <!-- Günüň Ösüşi -->
+  <div class="progress-card">
+    <div class="progress-labels">
+      <span id="current-day-name">Günüň maşklary</span>
+      <span id="progress-text">0 / 5 tamamlandy (0%)</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <!-- Split Tablary -->
+  <div class="tabs-wrapper">
+    <button class="tab-btn active" onclick="switchTab(this, 'tabChestTriceps')">Döş + Trisseps</button>
+    <button class="tab-btn" onclick="switchTab(this, 'tabBackBiceps')">Arka + Bisseps</button>
+    <button class="tab-btn" onclick="switchTab(this, 'tabShouldersLegs')">Egin + Aýak</button>
+    <button class="tab-btn" onclick="switchTab(this, 'tabAbs')">Press</button>
+  </div>
+
+  <!-- ==================== 1. DUŞENBE: GÖWÜS + TRISSEPS ==================== -->
+  <div id="tabChestTriceps" class="tab-content active">
+    
+    <div class="exercise-card" id="card_ct1">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('ct1')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-blue">Döş</span>
+            <div class="ex-name">1. Ýerde Gantel Basmak (Floor Press)</div>
+            <div class="ex-meta">15 kg transformer ganteller • 3 × 10–12</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ct1', 'gifs/a2.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ct1" class="gif-collapse"><img src="" alt="Floor Press"></div>
+    </div>
+
+    <div class="exercise-card" id="card_ct2">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('ct2')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-blue">Döş Giňligi</span>
+            <div class="ex-name">2. Ýerde Gantel Açmak (Dumbbell Fly)</div>
+            <div class="ex-meta">3.5 kg / 6 kg gantel • 3 × 12</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ct2', 'gifs/c3.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ct2" class="gif-collapse"><img src="" alt="Fly"></div>
+    </div>
+
+    <div class="exercise-card" id="card_ct3">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('ct3')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-blue">Döş</span>
+            <div class="ex-name">3. Otjimaniýe (Push-ups)</div>
+            <div class="ex-meta">Aýaklary diwana goýup • 3 × 10–15</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ct3', 'gifs/b2.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ct3" class="gif-collapse"><img src="" alt="Push ups"></div>
+    </div>
+
+    <div class="exercise-card" id="card_ct4">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('ct4')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-green">Trisseps</span>
+            <div class="ex-name">4. Kelle Arkasyndan Trisseps</div>
+            <div class="ex-meta">6 kg gantel bilen • 3 × 10–12</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ct4', 'gifs/a6.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ct4" class="gif-collapse"><img src="" alt="Tricep Extension"></div>
+    </div>
+
+    <div class="exercise-card" id="card_ct5">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('ct5')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-green">Trisseps</span>
+            <div class="ex-name">5. Bench Dips (Oturgyçda)</div>
+            <div class="ex-meta">Diwanda / Oturgyçda • 3 × 12</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ct5', 'gifs/b6.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ct5" class="gif-collapse"><img src="" alt="Bench Dips"></div>
+    </div>
+
+  </div>
+
+  <!-- ==================== 2. ÇARŞENBE: ARKA + BISSEPS ==================== -->
+  <div id="tabBackBiceps" class="tab-content">
+    
+    <div class="exercise-card" id="card_bb1">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('bb1')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-green">Ganatlar (Lats)</span>
+            <div class="ex-name">1. Ştanga Çekmek (Bent-over Row)</div>
+            <div class="ex-meta">10 kg ştanga bilen • 3 × 10–12</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_bb1', 'gifs/a3.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_bb1" class="gif-collapse"><img src="" alt="Row"></div>
+    </div>
+
+    <div class="exercise-card" id="card_bb2">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('bb2')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-green">Arka Ortasy</span>
+            <div class="ex-name">2. Bir El Bilen Çekmek (One-Arm Row)</div>
+            <div class="ex-meta">15 kg gantel bilen • 3 × 10–12</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_bb2', 'gifs/b3.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_bb2" class="gif-collapse"><img src="" alt="One arm row"></div>
+    </div>
+
+    <div class="exercise-card" id="card_bb3">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('bb3')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-green">Trapepsiýa</span>
+            <div class="ex-name">3. Egni Galdyrmak (Shrugs)</div>
+            <div class="ex-meta">15 kg ganteller bilen • 3 × 15</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_bb3', 'gifs/bk3.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_bb3" class="gif-collapse"><img src="" alt="Shrugs"></div>
+    </div>
+
+    <div class="exercise-card" id="card_bb4">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('bb4')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-blue">Bisseps</span>
+            <div class="ex-name">4. Ştanga Bisseps (Barbell Curl)</div>
+            <div class="ex-meta">10 kg ştanga bilen • 3 × 10–12</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_bb4', 'gifs/a5.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_bb4" class="gif-collapse"><img src="" alt="Bicep curl"></div>
+    </div>
+
+    <div class="exercise-card" id="card_bb5">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('bb5')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-blue">Bisseps & Bilek</span>
+            <div class="ex-name">5. Hammer Curl (Çekiç Usuly)</div>
+            <div class="ex-meta">Ganteller bilen • 3 × 10</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_bb5', 'gifs/b5.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_bb5" class="gif-collapse"><img src="" alt="Hammer curl"></div>
+    </div>
+
+  </div>
+
+  <!-- ==================== 3. ANNA: EGIN + AÝAK ==================== -->
+  <div id="tabShouldersLegs" class="tab-content">
+    
+    <div class="exercise-card" id="card_sl1">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('sl1')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-purple">Aýak</span>
+            <div class="ex-name">1. Goblet Squat (Oturyp-turmak)</div>
+            <div class="ex-meta">15 kg gantel bilen • 3 × 10–12</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_sl1', 'gifs/a1.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_sl1" class="gif-collapse"><img src="" alt="Squat"></div>
+    </div>
+
+    <div class="exercise-card" id="card_sl2">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('sl2')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-purple">Guýruk & Bud</span>
+            <div class="ex-name">2. Lunges (Öňe ädimläp oturmak)</div>
+            <div class="ex-meta">6 kg ganteller • 3 × 10 (her aýak)</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_sl2', 'gifs/b1.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_sl2" class="gif-collapse"><img src="" alt="Lunges"></div>
+    </div>
+
+    <div class="exercise-card" id="card_sl3">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('sl3')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-orange">Öň Egin</span>
+            <div class="ex-name">3. Ştanga Ýokaryk (Military Press)</div>
+            <div class="ex-meta">10 kg ştanga bilen • 3 × 8–10</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_sl3', 'gifs/a4.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_sl3" class="gif-collapse"><img src="" alt="Overhead Press"></div>
+    </div>
+
+    <div class="exercise-card" id="card_sl4">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('sl4')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-orange">Gapdal Egin (Giňlik)</span>
+            <div class="ex-name">4. Egin Gapdala Açmak (Lateral Raise)</div>
+            <div class="ex-meta">3.5 kg ganteller bilen • 3 × 12–15</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_sl4', 'gifs/b4.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_sl4" class="gif-collapse"><img src="" alt="Lateral Raise"></div>
+    </div>
+
+    <div class="exercise-card" id="card_sl5">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('sl5')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-purple">Baltyr</span>
+            <div class="ex-name">5. Baltyr Galdyryş (Calf Raise)</div>
+            <div class="ex-meta">Barmak uçlarynda galmak • 3 × 15–20</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_sl5', 'gifs/lg3.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_sl5" class="gif-collapse"><img src="" alt="Calf Raise"></div>
+    </div>
+
+  </div>
+
+  <!-- ==================== 4. SIŞENBE / PENŞENBE: PRESS ==================== -->
+  <div id="tabAbs" class="tab-content">
+    
+    <div class="exercise-card" id="card_ab1">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('ab1')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-green">Aşaky Garyn</span>
+            <div class="ex-name">1. Leg Raises (Aýak Galdyrmak)</div>
+            <div class="ex-meta">Ýerde dik aýaklar • 3 × 15</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ab1', 'gifs/p1.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ab1" class="gif-collapse"><img src="" alt="Leg Raise"></div>
+    </div>
+
+    <div class="exercise-card" id="card_ab2">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('ab2')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-blue">Ýokarky Garyn</span>
+            <div class="ex-name">2. Crunches (Garyn Bükmek)</div>
+            <div class="ex-meta">Dyzlary büküp • 3 × 15–20</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ab2', 'gifs/p2.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ab2" class="gif-collapse"><img src="" alt="Crunch"></div>
+    </div>
+
+    <div class="exercise-card" id="card_ab3">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('ab3')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-orange">Gapdal Garyn</span>
+            <div class="ex-name">3. Russian Twists (Iki Ýana)</div>
+            <div class="ex-meta">3.5 kg gantel bilen • 3 × 20</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ab3', 'gifs/p3.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ab3" class="gif-collapse"><img src="" alt="Russian Twist"></div>
+    </div>
+
+    <div class="exercise-card" id="card_ab4">
+      <div class="card-top">
+        <div class="left-section">
+          <div class="custom-check" onclick="toggleTask('ab4')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div class="ex-details">
+            <span class="badge badge-green">Kore & Bil</span>
+            <div class="ex-name">4. Planka (Plank)</div>
+            <div class="ex-meta">Tirsekleriň üstünde • 3 × 30–45 sek</div>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ab4', 'gifs/p4.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ab4" class="gif-collapse"><img src="" alt="Plank"></div>
+    </div>
+
+  </div>
+
+  <button class="btn-reset" onclick="clearAllChecks()">↺ Günlük Bellikleri Täzele</button>
+
+  <script>
+    function switchTab(btn, tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+      document.getElementById('current-day-name').innerText = btn.innerText;
+      updateProgress();
+    }
+
+    function toggleGif(boxId, localPath) {
+      const box = document.getElementById(boxId);
+      const img = box.querySelector('img');
+      if (box.classList.contains('open')) {
+        box.classList.remove('open');
+      } else {
+        if (!img.src || img.src.indexOf(localPath) === -1) {
+          img.src = localPath;
+        }
+        box.classList.add('open');
+      }
+    }
+
+    function toggleTask(id) {
+      const card = document.getElementById('card_' + id);
+      const check = card.querySelector('.custom-check');
+      const isChecked = check.classList.toggle('checked');
+      
+      if (isChecked) card.classList.add('completed');
+      else card.classList.remove('completed');
+
+      localStorage.setItem('split_task_' + id, isChecked);
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const currentTab = document.querySelector('.tab-content.active');
+      const total = currentTab.querySelectorAll('.exercise-card').length;
+      const completed = currentTab.querySelectorAll('.custom-check.checked').length;
+      const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+      document.getElementById('progress-fill').style.width = percent + '%';
+      document.getElementById('progress-text').innerText = `${completed} / ${total} tamamlandy (${percent}%)`;
+    }
+
+    function loadSavedState() {
+      document.querySelectorAll('.exercise-card').forEach(card => {
+        const id = card.id.replace('card_', '');
+        const isChecked = localStorage.getItem('split_task_' + id) === 'true';
+        if (isChecked) {
+          card.classList.add('completed');
+          card.querySelector('.custom-check').classList.add('checked');
+        }
+      });
+      updateProgress();
+    }
+
+    function clearAllChecks() {
+      if (confirm("Şu günki bellikleri arassalamak isleýärsiňizmi?")) {
+        const currentTab = document.querySelector('.tab-content.active');
+        currentTab.querySelectorAll('.exercise-card').forEach(c => {
+          c.classList.remove('completed');
+          const id = c.id.replace('card_', '');
+          localStorage.removeItem('split_task_' + id);
+        });
+        currentTab.querySelectorAll('.custom-check').forEach(c => c.classList.remove('checked'));
+        updateProgress();
+      }
+    }
+
+    function playBeep() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.35);
+      } catch (e) {}
+    }
+
+    let timerInterval;
+    function startTimer(seconds) {
+      clearInterval(timerInterval);
+      let left = seconds;
+      renderTime(left);
+      timerInterval = setInterval(() => {
+        left--;
+        renderTime(left);
+        if (left <= 0) {
+          clearInterval(timerInterval);
+          playBeep();
+        }
+      }, 1000);
+    }
+    function renderTime(sec) {
+      let m = Math.floor(sec / 60);
+      let s = sec % 60;
+      document.getElementById('time').innerText = 
+        (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    }
+    function resetTimer() {
+      clearInterval(timerInterval);
+      document.getElementById('time').innerText = "00:00";
+    }
+
+    window.onload = loadSavedState;
+  </script>
+</body>
+</html>

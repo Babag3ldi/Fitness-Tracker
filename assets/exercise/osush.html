@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="tk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Meniň Ösüşim & BMI</title>
+  <style>
+    :root {
+      --bg: #0b0e14;
+      --card-bg: rgba(22, 27, 34, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary: #ff5722;
+      --primary-gradient: linear-gradient(135deg, #ff6b3d, #ff3d00);
+      --accent-green: #00e676;
+      --accent-blue: #00b0ff;
+      --accent-yellow: #ffd600;
+      --accent-red: #ff5252;
+      --text-main: #f0f6fc;
+      --text-sub: #8b949e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      padding: 16px;
+      padding-bottom: 80px;
+      min-height: 100vh;
+    }
+
+    /* Navigasiýa */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-top: 4px;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .page-title { font-size: 18px; font-weight: 800; color: #fff; }
+
+    /* Kartlar */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+      backdrop-filter: blur(10px);
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 1. Agram Karty */
+    .weight-target {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+    .weight-target b { color: #fff; }
+    .bar-bg {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff5722, #00e676);
+      border-radius: 20px;
+      transition: width 0.4s ease;
+    }
+    .input-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .custom-input {
+      flex: 1;
+      background: #12161f;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+    .custom-input:focus { border-color: var(--primary); }
+    .btn-save {
+      background: var(--primary-gradient);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .history-list {
+      max-height: 120px;
+      overflow-y: auto;
+      margin-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 8px;
+    }
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      padding: 5px 0;
+      color: var(--text-sub);
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.04);
+    }
+
+    /* 2. BMI BÖLÜMI */
+    .bmi-result-box {
+      text-align: center;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .bmi-val {
+      font-size: 38px;
+      font-weight: 900;
+      color: var(--accent-green);
+      line-height: 1.1;
+    }
+    .bmi-category {
+      font-size: 14px;
+      font-weight: 800;
+      margin-top: 4px;
+      color: var(--accent-green);
+    }
+
+    /* BMI Şkalasy (Gradient Bar) */
+    .bmi-scale-wrapper {
+      position: relative;
+      margin: 20px 0 16px 0;
+    }
+    .bmi-scale-bar {
+      height: 12px;
+      border-radius: 20px;
+      background: linear-gradient(90deg, 
+        #00b0ff 0%, #00b0ff 18.5%, 
+        #00e676 18.5%, #00e676 55%, 
+        #ffd600 55%, #ffd600 80%, 
+        #ff5252 80%, #ff5252 100%);
+    }
+    .bmi-pointer {
+      position: absolute;
+      top: -14px;
+      transform: translateX(-50%);
+      font-size: 14px;
+      transition: left 0.4s ease;
+    }
+    .bmi-scale-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-sub);
+      margin-top: 6px;
+      font-weight: 700;
+    }
+
+    /* BMI Tablisasy */
+    .bmi-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+    .bmi-table th {
+      text-align: left;
+      padding: 8px 6px;
+      color: var(--text-sub);
+      border-bottom: 1px solid var(--card-border);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+    .bmi-table td {
+      padding: 9px 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .bmi-row.active {
+      background: rgba(0, 230, 118, 0.12);
+      border-radius: 8px;
+      font-weight: 700;
+    }
+    .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    /* 3. Beden Ölçegleri */
+    .measure-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .measure-box {
+      background: #12161f;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 9px;
+    }
+    .measure-box label { font-size: 11px; color: var(--text-sub); display: block; margin-bottom: 3px; font-weight: 600; }
+    .measure-box input { width: 100%; background: transparent; border: none; color: #fff; font-size: 15px; font-weight: 700; outline: none; }
+
+    /* 4. Rekordlar */
+    .record-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #12161f;
+      padding: 9px 12px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      border: 1px solid var(--card-border);
+    }
+    .record-row span { font-size: 12px; color: var(--text-sub); font-weight: 600; }
+    .record-row input {
+      width: 80px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: var(--accent-blue);
+      text-align: right;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 4px 6px;
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigasiýa -->
+  <div class="nav-bar">
+    <a href="index.html" class="back-btn">⬅ Baş Sahypa</a>
+    <div class="page-title">Meniň Ösüşim</div>
+  </div>
+
+  <!-- 1. AGRAM GÖZEGÇILIGI -->
+  <div class="card">
+    <div class="card-title">⚖️ Beden Agramy</div>
+    <div class="weight-target">
+      <span>Başlangyç: <b>65.0 kg</b></span>
+      <span>Häzirki: <b id="current-weight-lbl">66.0 kg</b></span>
+      <span>Maksat: <b style="color:var(--accent-green)">72.0 kg</b></span>
+    </div>
+    
+    <div class="bar-bg">
+      <div class="bar-fill" id="weight-bar"></div>
+    </div>
+
+    <div class="input-row">
+      <input type="number" step="0.1" class="custom-input" id="weight-input" placeholder="Täze agram (mysal: 66.0)">
+      <button class="btn-save" onclick="addWeight()">Ýaz</button>
+    </div>
+
+    <div style="font-size: 11px; color: var(--text-sub); margin-top: 6px; font-weight: 600;">Agram taryhy:</div>
+    <div class="history-list" id="weight-history"></div>
+  </div>
+
+  <!-- 2. BMI HASAPLAÝJY (SURATDAKY ÝALY) -->
+  <div class="card">
+    <div class="card-title">🧮 BMI (Beden Massasy Indeksi)</div>
+    
+    <!-- Giriş meýdançalary -->
+    <div class="input-row">
+      <input type="number" class="custom-input" id="bmi-height" placeholder="Boý (sm)" value="178" oninput="calculateBMI()">
+      <input type="number" step="0.1" class="custom-input" id="bmi-weight" placeholder="Agram (kg)" value="66" oninput="calculateBMI()">
+    </div>
+
+    <!-- Netije Gutusy -->
+    <div class="bmi-result-box">
+      <div style="font-size:12px; color:var(--text-sub);">Siziň BMI görkezijiňiz:</div>
+      <div class="bmi-val" id="bmi-number">20.8</div>
+      <div class="bmi-category" id="bmi-status">Healthy (Kadaly Agram)</div>
+    </div>
+
+    <!-- Reňkli Şkala -->
+    <div class="bmi-scale-wrapper">
+      <div class="bmi-pointer" id="bmi-pointer">▼</div>
+      <div class="bmi-scale-bar"></div>
+      <div class="bmi-scale-labels">
+        <span>18.5</span>
+        <span style="margin-left: 20px;">25.0</span>
+        <span>30.0</span>
+      </div>
+    </div>
+
+    <!-- BMI Tablisasy (NIH Salgysyndaky Ýaly) -->
+    <table class="bmi-table">
+      <thead>
+        <tr>
+          <th>Kategoriýa</th>
+          <th>BMI</th>
+          <th style="text-align:right;">Agram Aralygy</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="bmi-row" id="row-under">
+          <td><span class="dot" style="background:#00b0ff;"></span>Ýetmez (Underweight)</td>
+          <td>&lt; 18.5</td>
+          <td style="text-align:right;" id="range-under">&lt; 58.5 kg</td>
+        </tr>
+        <tr class="bmi-row active" id="row-normal">
+          <td><span class="dot" style="background:#00e676;"></span>Kadaly (Healthy)</td>
+          <td>18.5 – 24.9</td>
+          <td style="text-align:right;" id="range-normal">58.5 – 79.0 kg</td>
+        </tr>
+        <tr class="bmi-row" id="row-over">
+          <td><span class="dot" style="background:#ffd600;"></span>Aşa (Overweight)</td>
+          <td>25.0 – 29.9</td>
+          <td style="text-align:right;" id="range-over">79.1 – 94.8 kg</td>
+        </tr>
+        <tr class="bmi-row" id="row-obese">
+          <td><span class="dot" style="background:#ff5252;"></span>Semizlik (Obesity)</td>
+          <td>≥ 30.0</td>
+          <td style="text-align:right;" id="range-obese">&gt; 94.8 kg</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. BEDEN ÖLÇEGLERI -->
+  <div class="card">
+    <div class="card-title">📐 Beden Ölçegleri (sm)</div>
+    <div class="measure-grid">
+      <div class="measure-box"><label>Gol (Bisseps)</label><input type="number" id="m_arm" placeholder="sm" onchange="saveMeasurements()"></div>
+      <div class="measure-box"><label>Döş</label><input type="number" id="m_chest" placeholder="sm" onchange="saveMeasurements()"></div>
+      <div class="measure-box"><label>Eginler</label><input type="number" id="m_shoulders" placeholder="sm" onchange="saveMeasurements()"></div>
+      <div class="measure-box"><label>Bil</label><input type="number" id="m_waist" placeholder="sm" onchange="saveMeasurements()"></div>
+      <div class="measure-box"><label>Bud (Aýak)</label><input type="number" id="m_thigh" placeholder="sm" onchange="saveMeasurements()"></div>
+      <div class="measure-box"><label>Baltyr</label><input type="number" id="m_calf" placeholder="sm" onchange="saveMeasurements()"></div>
+    </div>
+  </div>
+
+  <!-- 4. REKORDLAR -->
+  <div class="card">
+    <div class="card-title">🏆 Şahsy Rekordlar</div>
+    <div class="record-row"><span>Otjimaniýe (1 podhod)</span><input type="number" id="rec_pushup" placeholder="gezek" onchange="saveRecords()"></div>
+    <div class="record-row"><span>Planka (sekuntda)</span><input type="number" id="rec_plank" placeholder="sek" onchange="saveRecords()"></div>
+    <div class="record-row"><span>Ştanga bilen Bisseps</span><input type="text" id="rec_bicep" placeholder="kg" onchange="saveRecords()"></div>
+  </div>
+
+  <script>
+    // 1. BMI Hasaplama
+    function calculateBMI() {
+      const h = parseFloat(document.getElementById('bmi-height').value);
+      const w = parseFloat(document.getElementById('bmi-weight').value);
+      if (!h || !w || h <= 0 || w <= 0) return;
+
+      const hMeter = h / 100;
+      const bmi = (w / (hMeter * hMeter)).toFixed(1);
+      document.getElementById('bmi-number').innerText = bmi;
+
+      // Suratdaky agram aralyklaryny boýa görä awtomat hasaplaýar
+      const minNormal = (18.5 * hMeter * hMeter).toFixed(1);
+      const maxNormal = (24.9 * hMeter * hMeter).toFixed(1);
+      const maxOver = (29.9 * hMeter * hMeter).toFixed(1);
+
+      document.getElementById('range-under').innerText = `< ${minNormal} kg`;
+      document.getElementById('range-normal').innerText = `${minNormal} – ${maxNormal} kg`;
+      document.getElementById('range-over').innerText = `${(parseFloat(maxNormal)+0.1).toFixed(1)} – ${maxOver} kg`;
+      document.getElementById('range-obese').innerText = `> ${maxOver} kg`;
+
+      // Kategoriýa kesgitlemek
+      const statusEl = document.getElementById('bmi-status');
+      const numEl = document.getElementById('bmi-number');
+      const pointer = document.getElementById('bmi-pointer');
+
+      document.querySelectorAll('.bmi-row').forEach(r => r.classList.remove('active'));
+
+      let percent = 0;
+      if (bmi < 18.5) {
+        statusEl.innerText = "Underweight (Ýetmez agram)";
+        statusEl.style.color = "#00b0ff";
+        numEl.style.color = "#00b0ff";
+        document.getElementById('row-under').classList.add('active');
+        percent = (bmi / 18.5) * 20;
+      } else if (bmi <= 24.9) {
+        statusEl.innerText = "Healthy (Kadaly Agram)";
+        statusEl.style.color = "#00e676";
+        numEl.style.color = "#00e676";
+        document.getElementById('row-normal').classList.add('active');
+        percent = 20 + ((bmi - 18.5) / (24.9 - 18.5)) * 40;
+      } else if (bmi <= 29.9) {
+        statusEl.innerText = "Overweight (Aşa agram)";
+        statusEl.style.color = "#ffd600";
+        numEl.style.color = "#ffd600";
+        document.getElementById('row-over').classList.add('active');
+        percent = 60 + ((bmi - 25.0) / (29.9 - 25.0)) * 25;
+      } else {
+        statusEl.innerText = "Obesity (Semizlik)";
+        statusEl.style.color = "#ff5252";
+        numEl.style.color = "#ff5252";
+        document.getElementById('row-obese').classList.add('active');
+        percent = 90;
+      }
+
+      pointer.style.left = Math.max(2, Math.min(percent, 98)) + '%';
+    }
+
+    // 2. Agram Taryhy
+    function getWeightData() { return JSON.parse(localStorage.getItem('weight_history') || '[]'); }
+    function addWeight() {
+      const val = parseFloat(document.getElementById('weight-input').value);
+      if (!val || val < 30 || val > 200) return alert("Dogry agram giriziň!");
+      const history = getWeightData();
+      const today = new Date().toLocaleDateString('tk-TM');
+      history.unshift({ date: today, weight: val });
+      localStorage.setItem('weight_history', JSON.stringify(history));
+      document.getElementById('weight-input').value = '';
+      document.getElementById('bmi-weight').value = val;
+      renderWeight();
+      calculateBMI();
+    }
+
+    function renderWeight() {
+      const history = getWeightData();
+      const list = document.getElementById('weight-history');
+      list.innerHTML = '';
+      let latest = 66.0;
+      if (history.length > 0) {
+        latest = history[0].weight;
+        history.forEach(item => {
+          list.innerHTML += `<div class="history-item"><span>${item.date}</span><span style="color:var(--accent-green); font-weight:bold;">${item.weight} kg</span></div>`;
+        });
+      } else {
+        list.innerHTML = '<div style="font-size:11px; color:#666; padding:4px 0;">Entäk bellenen agram ýok.</div>';
+      }
+      document.getElementById('current-weight-lbl').innerText = latest + ' kg';
+      document.getElementById('bmi-weight').value = latest;
+
+      // Maksat Barçasy (65 -> 72 kg)
+      let percent = Math.round(((latest - 65.0) / (72.0 - 65.0)) * 100);
+      document.getElementById('weight-bar').style.width = Math.max(0, Math.min(percent, 100)) + '%';
+    }
+
+    // 3. Beden Ölçegleri & Rekordlar
+    const measureKeys = ['m_arm', 'm_chest', 'm_shoulders', 'm_waist', 'm_thigh', 'm_calf'];
+    function saveMeasurements() { measureKeys.forEach(k => localStorage.setItem(k, document.getElementById(k).value)); }
+    function loadMeasurements() { measureKeys.forEach(k => document.getElementById(k).value = localStorage.getItem(k) || ''); }
+
+    const recordKeys = ['rec_pushup', 'rec_plank', 'rec_bicep'];
+    function saveRecords() { recordKeys.forEach(k => localStorage.setItem(k, document.getElementById(k).value)); }
+    function loadRecords() { recordKeys.forEach(k => document.getElementById(k).value = localStorage.getItem(k) || ''); }
+
+    window.onload = function() {
+      renderWeight();
+      loadMeasurements();
+      loadRecords();
+      calculateBMI();
+    };
+  </script>
+</body>
+</html>

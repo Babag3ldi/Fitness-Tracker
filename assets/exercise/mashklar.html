@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="tk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Maşklar Ensiklopediýasy</title>
+  <style>
+    :root {
+      --bg: #0b0e14;
+      --card-bg: rgba(22, 27, 34, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary: #ff5722;
+      --primary-gradient: linear-gradient(135deg, #ff6b3d, #ff3d00);
+      --accent-green: #00e676;
+      --accent-blue: #00b0ff;
+      --accent-purple: #b388ff;
+      --text-main: #f0f6fc;
+      --text-sub: #8b949e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      padding: 16px;
+      padding-bottom: 70px;
+      min-height: 100vh;
+    }
+
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-top: 4px;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .back-btn:active { transform: scale(0.95); background: rgba(255, 87, 34, 0.2); }
+    .page-title { font-size: 18px; font-weight: 800; color: #fff; }
+
+    /* Kategoriýalar */
+    .category-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      scrollbar-width: none;
+    }
+    .category-scroll::-webkit-scrollbar { display: none; }
+    
+    .cat-btn {
+      padding: 10px 16px;
+      background: rgba(22, 27, 34, 0.9);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: var(--text-sub);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .cat-btn.active {
+      background: var(--primary-gradient);
+      color: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(255, 87, 34, 0.35);
+    }
+
+    /* Kartlar */
+    .body-part-section { display: none; }
+    .body-part-section.active { display: block; animation: fadeIn 0.25s ease; }
+
+    .exercise-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+      backdrop-filter: blur(10px);
+    }
+    .card-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .ex-info { flex: 1; padding-right: 10px; }
+    .ex-badges { display: flex; gap: 6px; margin-bottom: 4px; }
+    
+    .badge {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+    .badge-orange { background: rgba(255, 87, 34, 0.15); color: #ff7043; }
+    .badge-blue { background: rgba(0, 176, 255, 0.15); color: #40c4ff; }
+    .badge-green { background: rgba(0, 230, 118, 0.15); color: #69f0ae; }
+    .badge-purple { background: rgba(179, 136, 255, 0.15); color: #b388ff; }
+
+    .ex-name { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+    .ex-sub { font-size: 12px; color: var(--text-sub); }
+
+    .btn-gif {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--accent-blue);
+      padding: 8px 13px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-gif:active { transform: scale(0.92); background: rgba(0, 176, 255, 0.15); }
+
+    .gif-box { display: none; margin-top: 12px; border-radius: 12px; overflow: hidden; background: #000; text-align: center; }
+    .gif-box.open { display: block; }
+    .gif-box img { max-width: 100%; height: auto; max-height: 220px; display: block; margin: 0 auto; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ýokarky Navigasiýa -->
+  <div class="nav-bar">
+    <a href="index.html" class="back-btn">⬅ Baş Sahypa</a>
+    <div class="page-title">Maşklar Toplumy</div>
+  </div>
+
+  <!-- Kategoriýalar -->
+  <div class="category-scroll">
+    <button class="cat-btn active" onclick="switchCategory(this, 'sec-chest')">Döş</button>
+    <button class="cat-btn" onclick="switchCategory(this, 'sec-back')">Arka</button>
+    <button class="cat-btn" onclick="switchCategory(this, 'sec-shoulders')">Eginler</button>
+    <button class="cat-btn" onclick="switchCategory(this, 'sec-legs')">Aýaklar</button>
+    <button class="cat-btn" onclick="switchCategory(this, 'sec-arms')">Eller</button>
+    <button class="cat-btn" onclick="switchCategory(this, 'sec-abs')">Press (Garyn)</button>
+  </div>
+
+  <!-- 1. GÖWÜS -->
+  <div id="sec-chest" class="body-part-section active">
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-blue">Döş Myşsalary</span></div>
+          <div class="ex-name">1. Ýerde Gantel Basmak (Floor Press)</div>
+          <div class="ex-sub">Esbap: 15 kg Ganteller | 3-4 × 10–12 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_c1', 'gifs/a2.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_c1" class="gif-box"><img src="" alt="Floor Press"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-blue">Döş Giňligi</span></div>
+          <div class="ex-name">2. Ýerde Gantel Açmak (Dumbbell Fly)</div>
+          <div class="ex-sub">Esbap: 3.5 kg / 6 kg Gantel | 3 × 12 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_c3', 'gifs/c3.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_c3" class="gif-box"><img src="" alt="Fly"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-blue">Umumy Döş</span></div>
+          <div class="ex-name">3. Otjimaniýe (Push-ups)</div>
+          <div class="ex-sub">Esbap: Öz agramyň | 3 × 12–15 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_c2', 'gifs/b2.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_c2" class="gif-box"><img src="" alt="Push Ups"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-blue">Döş Ortasy</span></div>
+          <div class="ex-name">4. Dar Otjimaniýe (Diamond Push-up)</div>
+          <div class="ex-sub">Elleri bilek ýana degrip | 3 × 8–10 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_c4', 'gifs/c4.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_c4" class="gif-box"><img src="" alt="Diamond Pushup"></div>
+    </div>
+  </div>
+
+  <!-- 2. ARKA -->
+  <div id="sec-back" class="body-part-section">
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-green">Ganatlar (Lats)</span></div>
+          <div class="ex-name">1. Ştanga Bilen Çekmek (Bent-over Row)</div>
+          <div class="ex-sub">Esbap: 10 kg Ştanga | 3 × 10–12 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_bk1', 'gifs/a3.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_bk1" class="gif-box"><img src="" alt="Barbell Row"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-green">Ganat & Arka Ortasy</span></div>
+          <div class="ex-name">2. Bir El Bilen Çekmek (One-Arm Row)</div>
+          <div class="ex-sub">Esbap: 15 kg Gantel | 3 × 10–12 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_bk2', 'gifs/b3.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_bk2" class="gif-box"><img src="" alt="One Arm Row"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-green">Trapepsiýa</span></div>
+          <div class="ex-name">3. Egni Galdyrmak (Dumbbell Shrugs)</div>
+          <div class="ex-sub">Esbap: 15 kg Ganteller | 3-4 × 15 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_bk3', 'gifs/bk3.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_bk3" class="gif-box"><img src="" alt="Shrugs"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-green">Bil & Oňurga</span></div>
+          <div class="ex-name">4. Superman Maşky (Bili Berkitmek)</div>
+          <div class="ex-sub">Esbap: Ýerde ýatyp | 3 × 15 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_bk4', 'gifs/bk4.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_bk4" class="gif-box"><img src="" alt="Superman"></div>
+    </div>
+  </div>
+
+  <!-- 3. EGINLER -->
+  <div id="sec-shoulders" class="body-part-section">
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-orange">Öň & Ýokarky Egin</span></div>
+          <div class="ex-name">1. Ştanga Ýokaryk (Military Press)</div>
+          <div class="ex-sub">Esbap: 10 kg Ştanga | 3 × 8–10 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_sh1', 'gifs/a4.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_sh1" class="gif-box"><img src="" alt="Military Press"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-orange">Gapdal Egin (Giňlik)</span></div>
+          <div class="ex-name">2. Egin Gapdala Açmak (Lateral Raise)</div>
+          <div class="ex-sub">Esbap: 3.5 kg Ganteller | 3-4 × 12–15 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_sh2', 'gifs/b4.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_sh2" class="gif-box"><img src="" alt="Lateral Raise"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-orange">Öň Egin</span></div>
+          <div class="ex-name">3. Öňe Galdyrmak (Front Raise)</div>
+          <div class="ex-sub">Esbap: 3.5 kg Ganteller | 3 × 12 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_sh3', 'gifs/sh3.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_sh3" class="gif-box"><img src="" alt="Front Raise"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-orange">Yzky Egin</span></div>
+          <div class="ex-name">4. Egilip Yza Açmak (Reverse Fly)</div>
+          <div class="ex-sub">Esbap: 3.5 kg Ganteller | 3 × 12–15 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_sh4', 'gifs/sh4.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_sh4" class="gif-box"><img src="" alt="Reverse Fly"></div>
+    </div>
+  </div>
+
+  <!-- 4. AÝAKLAR -->
+  <div id="sec-legs" class="body-part-section">
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-purple">Öň Bud (Kwadriseps)</span></div>
+          <div class="ex-name">1. Goblet Squat (Oturyp-turmak)</div>
+          <div class="ex-sub">Esbap: 15 kg Gantel | 3-4 × 10–12 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_lg1', 'gifs/a1.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_lg1" class="gif-box"><img src="" alt="Squat"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-purple">Guýruk & Bud</span></div>
+          <div class="ex-name">2. Lunges (Öňe ädim)</div>
+          <div class="ex-sub">Esbap: 6 kg Ganteller | 3 × 10 (her aýak)</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_lg2', 'gifs/b1.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_lg2" class="gif-box"><img src="" alt="Lunges"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-purple">Aýak Arkasy</span></div>
+          <div class="ex-name">3. Romanian Deadlift</div>
+          <div class="ex-sub">Esbap: Ştanga ýa-da Gantel | 3 × 10–12 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_lg4', 'gifs/lg4.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_lg4" class="gif-box"><img src="" alt="RDL"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-purple">Baltyr</span></div>
+          <div class="ex-name">4. Baltyr Galdyryş (Calf Raise)</div>
+          <div class="ex-sub">Barmak uçlarynda galmak | 3 × 15–20 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_lg3', 'gifs/lg3.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_lg3" class="gif-box"><img src="" alt="Calf Raise"></div>
+    </div>
+  </div>
+
+  <!-- 5. ELLER -->
+  <div id="sec-arms" class="body-part-section">
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-blue">Bisseps</span></div>
+          <div class="ex-name">1. Bisseps Bükmek (Barbell Curl)</div>
+          <div class="ex-sub">Esbap: 10 kg Ştanga | 3 × 10–12 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ar1', 'gifs/a5.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ar1" class="gif-box"><img src="" alt="Bicep Curl"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-blue">Bisseps & Bilek</span></div>
+          <div class="ex-name">2. Hammer Curl (Çekiç Usuly)</div>
+          <div class="ex-sub">Esbap: Ganteller bilen | 3 × 10–12 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ar2', 'gifs/b5.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ar2" class="gif-box"><img src="" alt="Hammer Curl"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-blue">Bisseps Piki</span></div>
+          <div class="ex-name">3. Concentration Curl (Oturyp Bükmek)</div>
+          <div class="ex-sub">Esbap: 6 kg Gantel | 3 × 10–12 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ar5', 'gifs/ar5.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ar5" class="gif-box"><img src="" alt="Concentration Curl"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-green">Trisseps</span></div>
+          <div class="ex-name">4. Kelle Arkasyndan Trisseps</div>
+          <div class="ex-sub">Esbap: 6 kg Gantel | 3 × 10–12 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ar3', 'gifs/a6.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ar3" class="gif-box"><img src="" alt="Tricep Extension"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-green">Trisseps</span></div>
+          <div class="ex-name">5. Bench Dips (Oturgyçda)</div>
+          <div class="ex-sub">Diwanda / Oturgyçda | 3 × 12–15 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ar4', 'gifs/b6.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ar4" class="gif-box"><img src="" alt="Bench Dips"></div>
+    </div>
+  </div>
+
+  <!-- 6. PRESS (GARYN) -->
+  <div id="sec-abs" class="body-part-section">
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-green">Aşaky Garyn</span></div>
+          <div class="ex-name">1. Leg Raises (Dik Aýak Galdyryş)</div>
+          <div class="ex-sub">Esbap: Ýerde ýatyp | 3 × 15 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ab1', 'gifs/p1.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ab1" class="gif-box"><img src="" alt="Leg Raises"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-blue">Ýokarky Garyn</span></div>
+          <div class="ex-name">2. Crunches (Garyn Bükmek)</div>
+          <div class="ex-sub">Dyzlary büküp | 3 × 15–20 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ab2', 'gifs/p2.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ab2" class="gif-box"><img src="" alt="Crunches"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-orange">Gapdal Garyn</span></div>
+          <div class="ex-name">3. Russian Twists (Iki Ýana)</div>
+          <div class="ex-sub">3.5 kg Gantel bilen | 3 × 20 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ab3', 'gifs/p3.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ab3" class="gif-box"><img src="" alt="Russian Twist"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-orange">Dinamiki Press</span></div>
+          <div class="ex-name">4. Welosiped (Bicycle Crunch)</div>
+          <div class="ex-sub">Tirsek bilen garşydaş dyza degmek | 3 × 20 gezek</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ab5', 'gifs/ab5.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ab5" class="gif-box"><img src="" alt="Bicycle Crunch"></div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="card-main">
+        <div class="ex-info">
+          <div class="ex-badges"><span class="badge badge-green">Tutuş Garyn & Bil</span></div>
+          <div class="ex-name">5. Planka (Plank)</div>
+          <div class="ex-sub">Tirseklerde durmak | 3 × 30–45 sekunt</div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('gif_ab4', 'gifs/p4.gif')">▶ GIF</button>
+      </div>
+      <div id="gif_ab4" class="gif-box"><img src="" alt="Plank"></div>
+    </div>
+  </div>
+
+  <script>
+    function switchCategory(btn, sectionId) {
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.body-part-section').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(sectionId).classList.add('active');
+    }
+
+    function toggleGif(boxId, localPath) {
+      const box = document.getElementById(boxId);
+      const img = box.querySelector('img');
+      if (box.classList.contains('open')) {
+        box.classList.remove('open');
+      } else {
+        if (!img.src || img.src.indexOf(localPath) === -1) {
+          img.src = localPath;
+        }
+        box.classList.add('open');
+      }
+    }
+  </script>
+</body>
+</html>

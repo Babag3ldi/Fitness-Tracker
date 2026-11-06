@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="tk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Gyzyşmak & Süýndürme</title>
+  <style>
+    :root {
+      --bg: #0b0e14;
+      --card-bg: rgba(22, 27, 34, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary: #ff5722;
+      --primary-gradient: linear-gradient(135deg, #ff6b3d, #ff3d00);
+      --accent-green: #00e676;
+      --accent-blue: #00b0ff;
+      --text-main: #f0f6fc;
+      --text-sub: #8b949e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      padding: 16px;
+      padding-bottom: 80px;
+      min-height: 100vh;
+    }
+
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-top: 4px;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .page-title { font-size: 18px; font-weight: 800; color: #fff; }
+
+    /* Taýmer */
+    .timer-banner {
+      background: linear-gradient(180deg, #18202c, #12161f);
+      border: 1px solid rgba(0, 176, 255, 0.25);
+      border-radius: 16px;
+      padding: 14px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .timer-sec { font-size: 34px; font-weight: 900; color: var(--accent-blue); }
+    .timer-btns { display: flex; gap: 8px; justify-content: center; margin-top: 6px; }
+    .t-btn { background: rgba(255,255,255,0.08); border: 1px solid var(--card-border); color: #fff; padding: 6px 14px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; }
+
+    /* Tablar */
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab-btn { flex: 1; padding: 12px; background: rgba(22, 27, 34, 0.9); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-sub); font-size: 13px; font-weight: 800; cursor: pointer; }
+    .tab-btn.active { background: var(--primary-gradient); color: #fff; border-color: var(--primary); }
+
+    .content-sec { display: none; }
+    .content-sec.active { display: block; }
+
+    .stretch-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .card-main { display: flex; align-items: center; justify-content: space-between; }
+    .left-box { display: flex; align-items: center; gap: 12px; flex: 1; padding-right: 8px; }
+    .num-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255, 87, 34, 0.15);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    .stretch-info h3 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+    .stretch-info p { font-size: 12px; color: var(--text-sub); }
+
+    .btn-gif {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--accent-blue);
+      padding: 7px 12px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-gif:active { transform: scale(0.92); }
+
+    .gif-box { display: none; margin-top: 12px; border-radius: 12px; overflow: hidden; background: #000; text-align: center; }
+    .gif-box.open { display: block; }
+    .gif-box img { max-width: 100%; height: auto; max-height: 200px; display: block; margin: 0 auto; }
+  </style>
+</head>
+<body>
+
+  <!-- Navigasiýa -->
+  <div class="nav-bar">
+    <a href="index.html" class="back-btn">⬅ Baş Sahypa</a>
+    <div class="page-title">Gyzyşmak & Süýndürme</div>
+  </div>
+
+  <!-- Taýmer -->
+  <div class="timer-banner">
+    <div style="font-size: 11px; color: var(--text-sub); text-transform: uppercase; font-weight: bold;">Her hereket üçin taýmer</div>
+    <div class="timer-sec" id="timer-val">30s</div>
+    <div class="timer-btns">
+      <button class="t-btn" onclick="startTimer(30)">▶ 30 sekunt Başla</button>
+      <button class="t-btn" onclick="stopTimer()" style="color:#ff5252">■ Sakla</button>
+    </div>
+  </div>
+
+  <!-- Tablar -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchSec(this, 'sec-warmup')">🔥 Türgenleşikden Öň</button>
+    <button class="tab-btn" onclick="switchSec(this, 'sec-cooldown')">🧘 Türgenleşikden Soň</button>
+  </div>
+
+  <!-- 1. TÜRGENLEŞIKDEN ÖŇ (GYZYŞMAK) -->
+  <div id="sec-warmup" class="content-sec active">
+    
+    <div class="stretch-card">
+      <div class="card-main">
+        <div class="left-box">
+          <div class="num-circle">1</div>
+          <div class="stretch-info">
+            <h3>Eginleri Aýlamak (Arm Circles)</h3>
+            <p>Egin bogunlaryny öňe we yza aýlaň | 30 sek</p>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('g_rz1', 'gifs/rz1.gif')">▶ GIF</button>
+      </div>
+      <div id="g_rz1" class="gif-box"><img src="" alt="Arm Circles"></div>
+    </div>
+
+    <div class="stretch-card">
+      <div class="card-main">
+        <div class="left-box">
+          <div class="num-circle">2</div>
+          <div class="stretch-info">
+            <h3>Beden Öwürmek (Windmill)</h3>
+            <p>Aýaklary açyp garşydaş barmaga degmek | 30 sek</p>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('g_rz2', 'gifs/rz2.gif')">▶ GIF</button>
+      </div>
+      <div id="g_rz2" class="gif-box"><img src="" alt="Windmill"></div>
+    </div>
+
+    <div class="stretch-card">
+      <div class="card-main">
+        <div class="left-box">
+          <div class="num-circle">3</div>
+          <div class="stretch-info">
+            <h3>Bili Gyzdyrmak (Toe Touch)</h3>
+            <p>Egilip aýak barmaklaryna degmek | 30 sek</p>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('g_rz3', 'gifs/rz3.gif')">▶ GIF</button>
+      </div>
+      <div id="g_rz3" class="gif-box"><img src="" alt="Toe touch"></div>
+    </div>
+
+    <div class="stretch-card">
+      <div class="card-main">
+        <div class="left-box">
+          <div class="num-circle">4</div>
+          <div class="stretch-info">
+            <h3>Ýeňil Oturyp-Turmak (Squats)</h3>
+            <p>Agramsyz, aýak bogunlaryny taýýarlamak | 15 gezek</p>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('g_rz4', 'gifs/a1.gif')">▶ GIF</button>
+      </div>
+      <div id="g_rz4" class="gif-box"><img src="" alt="Squat"></div>
+    </div>
+
+    <div class="stretch-card">
+      <div class="card-main">
+        <div class="left-box">
+          <div class="num-circle">5</div>
+          <div class="stretch-info">
+            <h3>Jumping Jacks (Böküş)</h3>
+            <p>Ýürek urşuny we gan aýlanyşy gyzdyrmak | 30 sek</p>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('g_rz5', 'gifs/rz5.gif')">▶ GIF</button>
+      </div>
+      <div id="g_rz5" class="gif-box"><img src="" alt="Jumping Jacks"></div>
+    </div>
+
+  </div>
+
+  <!-- 2. TÜRGENLEŞIKDEN SOŇ (SÜÝNDÜRME) -->
+  <div id="sec-cooldown" class="content-sec">
+    
+    <div class="stretch-card">
+      <div class="card-main">
+        <div class="left-box">
+          <div class="num-circle" style="color:var(--accent-green); background:rgba(0,230,118,0.15)">1</div>
+          <div class="stretch-info">
+            <h3>Döş we Egni Açmak</h3>
+            <p>Döş myşsalaryny süýndürip açmak | 20 sek</p>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('g_st1', 'gifs/st1.gif')">▶ GIF</button>
+      </div>
+      <div id="g_st1" class="gif-box"><img src="" alt="Chest Stretch"></div>
+    </div>
+
+    <div class="stretch-card">
+      <div class="card-main">
+        <div class="left-box">
+          <div class="num-circle" style="color:var(--accent-green); background:rgba(0,230,118,0.15)">2</div>
+          <div class="stretch-info">
+            <h3>Arka Süýndürmek (Child Pose)</h3>
+            <p>Dyzda oturyp elleri öňe uzatmak | 30 sek</p>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('g_st2', 'gifs/st2.gif')">▶ GIF</button>
+      </div>
+      <div id="g_st2" class="gif-box"><img src="" alt="Child Pose"></div>
+    </div>
+
+    <div class="stretch-card">
+      <div class="card-main">
+        <div class="left-box">
+          <div class="num-circle" style="color:var(--accent-green); background:rgba(0,230,118,0.15)">3</div>
+          <div class="stretch-info">
+            <h3>Öň Budy Süýndürmek (Quad Stretch)</h3>
+            <p>Aýagy yzdan tutup guýruga gysmak | her aýak 20 sek</p>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('g_st3', 'gifs/st3.gif')">▶ GIF</button>
+      </div>
+      <div id="g_st3" class="gif-box"><img src="" alt="Quad Stretch"></div>
+    </div>
+
+    <div class="stretch-card">
+      <div class="card-main">
+        <div class="left-box">
+          <div class="num-circle" style="color:var(--accent-green); background:rgba(0,230,118,0.15)">4</div>
+          <div class="stretch-info">
+            <h3>Kobra Durşy (Garny Süýndürmek)</h3>
+            <p>Ýerde ýüzin ýatyp ellerde galkmak | 30 sek</p>
+          </div>
+        </div>
+        <button class="btn-gif" onclick="toggleGif('g_st4', 'gifs/st4.gif')">▶ GIF</button>
+      </div>
+      <div id="g_st4" class="gif-box"><img src="" alt="Cobra"></div>
+    </div>
+
+  </div>
+
+  <script>
+    function switchSec(btn, secId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.content-sec').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(secId).classList.add('active');
+    }
+
+    function toggleGif(boxId, localPath) {
+      const box = document.getElementById(boxId);
+      const img = box.querySelector('img');
+      if (box.classList.contains('open')) {
+        box.classList.remove('open');
+      } else {
+        if (!img.src || img.src.indexOf(localPath) === -1) {
+          img.src = localPath;
+        }
+        box.classList.add('open');
+      }
+    }
+
+    let timer;
+    function startTimer(sec) {
+      clearInterval(timer);
+      let t = sec;
+      document.getElementById('timer-val').innerText = t + 's';
+      timer = setInterval(() => {
+        t--;
+        document.getElementById('timer-val').innerText = t + 's';
+        if (t <= 0) {
+          clearInterval(timer);
+          alert("Wagt gutardy! Indiki herekete geçiň.");
+        }
+      }, 1000);
+    }
+    function stopTimer() {
+      clearInterval(timer);
+      document.getElementById('timer-val').innerText = '30s';
+    }
+  </script>
+</body>
+</html>
